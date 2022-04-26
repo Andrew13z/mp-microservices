@@ -1,4 +1,4 @@
-package com.example.microsender.producer;
+package com.example.microsender.publisher;
 
 public interface NotificationPublisher {
 

@@ -1,0 +1,54 @@
+services:
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - recipient
+      - sender
+
+  eureka:
+    build: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - recipient
+
+  micro-sender:
+    build: micro-sender
+    environment:
+      - spring.rabbitmq.port=5672
+      - spring.rabbitmq.host=rabbit
+    ports:
+      - "8080:8080"
+    networks:
+      - sender
+    depends_on:
+      - "rabbit"
+
+  micro-recipient:
+    build: micro-recipient
+    ports:
+      - "8081:8081"
+    networks:
+      - recipient
+    depends_on:
+      - micro-sender
+
+  micro-collector:
+    build: micro-collector
+    ports:
+      - "8082:8082"
+    networks:
+      - recipient
+    depends_on:
+      - "micro-recipient"
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+networks:
+  sender:
+  recipient:
+

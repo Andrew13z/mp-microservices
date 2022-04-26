@@ -1,7 +1,7 @@
 package com.example.microsender.service.impl;
 
 import com.example.microsender.dto.NotificationDto;
-import com.example.microsender.producer.NotificationPublisher;
+import com.example.microsender.publisher.NotificationPublisher;
 import com.example.microsender.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
