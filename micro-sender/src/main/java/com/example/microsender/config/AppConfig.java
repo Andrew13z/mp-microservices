@@ -1,5 +1,6 @@
 package com.example.microsender.config;
 
+import io.prometheus.client.CollectorRegistry;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -33,5 +34,10 @@ public class AppConfig {
   @Bean
   public Binding binding(Queue queue, TopicExchange exchange) {
     return BindingBuilder.bind(queue).to(exchange).with(routingKey);
+  }
+
+  @Bean
+  public CollectorRegistry collectorRegistry() {
+    return CollectorRegistry.defaultRegistry;
   }
 }

@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 30s
+  scrape_timeout: 10s
+
+rule_files:
+  - alert.yml
+
+scrape_configs:
+  - job_name: microservices
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - 'micro-sender:8080'
+          - 'micro-recipient:8081'
+          - 'micro-collector:8082'
