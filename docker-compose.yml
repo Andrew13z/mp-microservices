@@ -1,111 +1,123 @@
 services:
-  rabbit:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    networks:
-      - recipient
-      - sender
+    rabbit:
+        image: rabbitmq:3-management
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        networks:
+            - recipient
+            - sender
 
-  eureka:
-    build: eureka-server
-    ports:
-      - "8761:8761"
-    networks:
-      - recipient
-    healthcheck:
-      test: curl --fail localhost:8761 || exit 1
-      interval: 30s
-      retries: 10
-      start_period: 1m
-      timeout: 10s
+    eureka:
+        build: eureka-server
+        ports:
+            - "8761:8761"
+        networks:
+            - recipient
+        healthcheck:
+            test: curl --fail localhost:8761 || exit 1
+            interval: 30s
+            retries: 10
+            start_period: 1m
+            timeout: 10s
 
-  micro-sender:
-    build: micro-sender
-    environment:
-      - spring.rabbitmq.port=5672
-      - spring.rabbitmq.host=rabbit
-    ports:
-      - "8080:8080"
-    networks:
-      - sender
-    healthcheck:
-      test: curl --fail localhost:8080/actuator/health || exit 1
-      interval: 30s
-      retries: 20
-      start_period: 5m
-      timeout: 10s
-    depends_on:
-      eureka:
-        condition: service_healthy
+    micro-sender:
+        build: micro-sender
+        environment:
+            - RABBIT_PORT=5672
+            - RABBIT_HOST=rabbit
+            - RABBIT_EXCHANGE_NAME=notification_exchange
+            - RABBIT_QUEUE_NAME=notification_queue
+            - RABBIT_ROUTING_KEY=notification_routing_key
+        ports:
+            - "8080:8080"
+        networks:
+            - sender
+        healthcheck:
+            test: curl --fail localhost:8080/actuator/health || exit 1
+            interval: 30s
+            retries: 20
+            start_period: 5m
+            timeout: 10s
+        depends_on:
+            eureka:
+                condition: service_healthy
 
-  micro-recipient:
-    build: micro-recipient
-    ports:
-      - "8081:8081"
-    networks:
-      - recipient
-    healthcheck:
-      test: curl --fail localhost:8081/actuator/health || exit 1
-      interval: 30s
-      retries: 20
-      start_period: 5m
-      timeout: 10s
-    depends_on:
-      micro-sender:
-        condition: service_healthy
-    deploy:
-      restart_policy:
-        condition: on-failure
+    micro-recipient:
+        build: micro-recipient
+        environment:
+            - RABBIT_PORT=5672
+            - RABBIT_HOST=rabbit
+            - RABBIT_QUEUE_NAME=notification_queue
+            - RABBIT_EXCHANGE_NAME=notification_exchange
+            - RABBIT_ROUTING_KEY=notification_routing_key
+            - EUREKA_ADDRESS=http://eureka:8761/eureka
+        ports:
+            - "8081:8081"
+        networks:
+            - recipient
+        healthcheck:
+            test: curl --fail localhost:8081/actuator/health || exit 1
+            interval: 30s
+            retries: 20
+            start_period: 5m
+            timeout: 10s
+        depends_on:
+            micro-sender:
+                condition: service_healthy
+        deploy:
+            restart_policy:
+                condition: on-failure
 
-  micro-collector:
-    build: micro-collector
-    ports:
-      - "8082:8082"
-    networks:
-      - recipient
-    healthcheck:
-      test: curl --fail localhost:8082/actuator/health || exit 1
-      interval: 30s
-      retries: 20
-      start_period: 5m
-      timeout: 10s
-    depends_on:
-      micro-recipient:
-        condition: service_healthy
-    deploy:
-      restart_policy:
-        condition: on-failure
+    micro-collector:
+        build: micro-collector
+        environment:
+            - EUREKA_ADDRESS=http://eureka:8761/eureka
+        ports:
+            - "8082:8082"
+        networks:
+            - recipient
+        healthcheck:
+            test: curl --fail localhost:8082/actuator/health || exit 1
+            interval: 30s
+            retries: 20
+            start_period: 5m
+            timeout: 10s
+        depends_on:
+            micro-recipient:
+                condition: service_healthy
+        deploy:
+            restart_policy:
+                condition: on-failure
 
-  prometheus:
-    image: prom/prometheus:v2.30.3
-    ports:
-      - 9090:9090
-    volumes:
-      - ./prometheus:/etc/prometheus
-      - prometheus-data:/prometheus
-    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
-    networks:
-      - recipient
-      - sender
-      - metrics
+    prometheus:
+        image: prom/prometheus:v2.30.3
+        ports:
+            - 9090:9090
+        volumes:
+            - ./prometheus:/etc/prometheus
+            - prometheus-data:/prometheus
+        command: --web.enable-lifecycle    --config.file=/etc/prometheus/prometheus.yml
+        networks:
+            - recipient
+            - sender
+            - metrics
 
-  grafana:
-    image: grafana/grafana
-    ports:
-      - 3000:3000
-    volumes:
-      - grafana-data:/var/lib/grafana
-    networks:
-      - metrics
+    grafana:
+        image: grafana/grafana
+        ports:
+            - 3000:3000
+        volumes:
+            - grafana-data:/var/lib/grafana
+        networks:
+            - metrics
 
 volumes:
-  prometheus-data:
-  grafana-data:
+    prometheus-data:
+    grafana-data:
 
 networks:
-  sender:
-  recipient:
-  metrics:
+    sender:
+    recipient:
+    metrics:
 

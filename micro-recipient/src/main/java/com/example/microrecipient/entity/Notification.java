@@ -1,6 +1,7 @@
 package com.example.microrecipient.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Notification {
 
   @Id
@@ -20,4 +22,8 @@ public class Notification {
 
   @Column
   private String message;
+
+  public Notification(String message) {
+    this.message = message;
+  }
 }

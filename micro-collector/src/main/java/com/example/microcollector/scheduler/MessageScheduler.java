@@ -13,7 +13,7 @@ public class MessageScheduler {
 
   private final MicroRecipientClient client;
 
-  @Scheduled(fixedDelay = 20_000L)
+  @Scheduled(fixedDelay = 30_000L)
   public void getAndLogMessages() {
     var allMessages = client.getAllMessages();
     log.info("Received {} message(s) from micro-recipient service: {}.", allMessages.size(), allMessages);

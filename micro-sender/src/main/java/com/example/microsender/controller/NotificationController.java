@@ -1,7 +1,7 @@
 package com.example.microsender.controller;
 
-import com.example.microsender.service.NotificationService;
 import com.example.microsender.dto.NotificationDto;
+import com.example.microsender.service.NotificationService;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.Summary;
@@ -28,6 +28,7 @@ public class NotificationController {
     CollectorRegistry collectorRegistry) {
     this.notificationService = notificationService;
     this.requestLatency = Histogram.build()
+      .buckets(0.1, 0.5, 1.0, 5.0)
       .name("request_latency_seconds")
       .help("Request latency in seconds.")
       .register(collectorRegistry);
