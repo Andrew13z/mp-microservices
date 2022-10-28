@@ -41,9 +41,4 @@ public class RabbitConfig {
   public CollectorRegistry collectorRegistry() {
     return CollectorRegistry.defaultRegistry;
   }
-
-  @Bean
-  public CollectorRegistry collectorRegistry() {
-    return CollectorRegistry.defaultRegistry;
-  }
 }
