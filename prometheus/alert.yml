@@ -1,5 +1,5 @@
 groups:
-  - name: DemoAlerts
+  - name: Instance Is Down
     rules:
       - alert: InstanceDown
         expr: up{job="microservices"} < 1

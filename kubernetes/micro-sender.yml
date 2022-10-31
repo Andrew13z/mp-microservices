@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micro-sender-deployment
+  labels:
+    app: micro-sender
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: micro-sender
+  template:
+    metadata:
+      labels:
+        app: micro-sender
+    spec:
+      containers:
+        - name: micro-sender
+          image: mp/micro-sender
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: RABBIT_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbit-configmap
+                  key: rabbit_port
+            - name: RABBIT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbit-configmap
+                  key: rabbit_host
+            - name: RABBIT_EXCHANGE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbit-configmap
+                  key: exchange_name
+            - name: RABBIT_QUEUE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbit-configmap
+                  key: queue_name
+            - name: RABBIT_ROUTING_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbit-configmap
+                  key: routing_key_name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: micro-sender-service
+spec:
+  selector:
+    app: micro-sender
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: micro-sender-external-service
+spec:
+  selector:
+    app: micro-sender
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 32080

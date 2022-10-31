@@ -52,6 +52,7 @@ services:
             - RABBIT_EXCHANGE_NAME=notification_exchange
             - RABBIT_ROUTING_KEY=notification_routing_key
             - EUREKA_ADDRESS=http://eureka:8761/eureka
+            - PREFER_IP_ADDRESS=false
         ports:
             - "8081:8081"
         networks:
@@ -73,6 +74,7 @@ services:
         build: micro-collector
         environment:
             - EUREKA_ADDRESS=http://eureka:8761/eureka
+            - PREFER_IP_ADDRESS=false
         ports:
             - "8082:8082"
         networks:

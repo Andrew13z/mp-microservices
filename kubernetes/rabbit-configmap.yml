@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbit-configmap
+data:
+  rabbit_port: '5672'
+  rabbit_host: rabbit-service
+  exchange_name: notification_exchange
+  queue_name: notification_queue
+  routing_key_name: notification_routing_key
