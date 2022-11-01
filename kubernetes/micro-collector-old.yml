@@ -5,7 +5,7 @@ metadata:
   labels:
     app: micro-collector
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: micro-collector
@@ -13,10 +13,11 @@ spec:
     metadata:
       labels:
         app: micro-collector
+        version: '1.0'
     spec:
       containers:
         - name: micro-collector
-          image: mp/micro-collector:2.0
+          image: mp/micro-collector
           imagePullPolicy: Never
           ports:
             - containerPort: 8082
@@ -29,7 +30,7 @@ spec:
             - name: PREFER_IP_ADDRESS
               value: 'true'
             - name: POSTGRES_URL
-              value: postgres-service:5432/postgres
+              value: postgres:5432
             - name: POSTGRES_USERNAME
               valueFrom:
                 secretKeyRef:

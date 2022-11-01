@@ -28,3 +28,4 @@ data:
               - 'micro-sender-service:8080'
               - 'micro-recipient-service:8081'
               - 'micro-collector-service:8082'
+              - 'micro-visualizer-service:8083'

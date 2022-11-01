@@ -21,6 +21,15 @@ services:
             start_period: 1m
             timeout: 10s
 
+    postgres:
+        image: postgres
+        ports:
+            - "5432:5432"
+        networks:
+          - recipient
+        environment:
+            - POSTGRES_PASSWORD=postgres
+
     micro-sender:
         build: micro-sender
         environment:
@@ -75,6 +84,9 @@ services:
         environment:
             - EUREKA_ADDRESS=http://eureka:8761/eureka
             - PREFER_IP_ADDRESS=false
+            - POSTGRES_URL=postgres:5432/postgres
+            - POSTGRES_USERNAME=postgres
+            - POSTGRES_PASSWORD=postgres
         ports:
             - "8082:8082"
         networks:
