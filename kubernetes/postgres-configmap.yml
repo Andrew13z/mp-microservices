@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: rabbit-configmap
-data:
-  database_url: rabbit-service

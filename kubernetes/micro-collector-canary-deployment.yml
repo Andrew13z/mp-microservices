@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: micro-collector-deployment
+  name: micro-collector-canary-deployment
   labels:
     app: micro-collector
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: micro-collector
@@ -13,11 +13,11 @@ spec:
     metadata:
       labels:
         app: micro-collector
-        version: '1.0'
+        version: '2.0'
     spec:
       containers:
         - name: micro-collector
-          image: mp/micro-collector
+          image: mp/micro-collector:2.0
           imagePullPolicy: Never
           ports:
             - containerPort: 8082
@@ -30,7 +30,7 @@ spec:
             - name: PREFER_IP_ADDRESS
               value: 'true'
             - name: POSTGRES_URL
-              value: postgres:5432
+              value: postgres-service:5432/postgres
             - name: POSTGRES_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -41,30 +41,3 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: postgres_root_password
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: micro-collector-service
-spec:
-  type: LoadBalancer
-  selector:
-    app: micro-collector
-  ports:
-    - protocol: TCP
-      port: 8082
-      targetPort: 8082
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: micro-collector-external-service
-spec:
-  selector:
-    app: micro-collector
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 8082
-      targetPort: 8082
-      nodePort: 32082
