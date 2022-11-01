@@ -5,7 +5,7 @@ metadata:
   labels:
     app: micro-recipient
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: micro-recipient
@@ -13,7 +13,6 @@ spec:
     metadata:
       labels:
         app: micro-recipient
-        version: '2.0'
     spec:
       containers:
         - name: micro-recipient
