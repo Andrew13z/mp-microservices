@@ -104,6 +104,29 @@ services:
             restart_policy:
                 condition: on-failure
 
+    micro-visualizer:
+        build: micro-visualizer
+        environment:
+            - POSTGRES_URL=postgres:5432/postgres
+            - POSTGRES_USERNAME=postgres
+            - POSTGRES_PASSWORD=postgres
+        ports:
+            - "8083:8083"
+        networks:
+            - recipient
+        healthcheck:
+            test: curl --fail localhost:8083/actuator/health || exit 1
+            interval: 30s
+            retries: 20
+            start_period: 5m
+            timeout: 10s
+        depends_on:
+            micro-recipient:
+                condition: service_healthy
+        deploy:
+            restart_policy:
+                condition: on-failure
+
     prometheus:
         image: prom/prometheus:v2.30.3
         ports:
