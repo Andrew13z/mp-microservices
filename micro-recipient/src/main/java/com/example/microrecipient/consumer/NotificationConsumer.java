@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Component
@@ -29,31 +28,23 @@ public class NotificationConsumer {
     this.notificationRepository = notificationRepository;
   }
 
-  //@RabbitListener(queues = "notification_queue")
-  @Scheduled(fixedDelay = 15_000L)
+  @Scheduled(fixedDelay = 5_000L)
   public void processMessageFromQueue() {
-    log.info("Scheduled retrieval of message from the {} queue.", queueName);
+    log.info("Scheduled retrieval of a message from the {} queue.", queueName);
 
     var messageOptional = convertMessage(rabbitTemplate.receive(queueName));
-    var notifications = new ArrayList<Notification>();
 
-    while (messageOptional.isPresent()) {
+    if (messageOptional.isPresent()) {
       var message = messageOptional.get();
       log.info("Received message '{}' from the queue.", message);
-      notifications.add(new Notification(message));
-      messageOptional = convertMessage(rabbitTemplate.receive(queueName));
-    }
-    log.info("Retrieved {} messages from the queue.", notifications.size());
-
-    if (!notifications.isEmpty()) {
-      notificationRepository.saveAll(notifications);
-      log.info("Saved {} messages.", notifications.size());
+      notificationRepository.save(new Notification(message));
+      log.info("Message '{}' saved to the H2.", message);
     }
   }
 
   private Optional<String> convertMessage(Message message) {
     return Optional.ofNullable(message)
-        .map(m -> new String(m.getBody()));
+      .map(m -> new String(m.getBody()));
   }
 
 }

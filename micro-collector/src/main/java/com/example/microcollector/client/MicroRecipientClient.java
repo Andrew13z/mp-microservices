@@ -10,4 +10,7 @@ public interface MicroRecipientClient {
 
   @GetMapping("/message")
   List<String> getAllMessages();
+
+  @GetMapping("/single-message")
+  String getAndDeleteSingleMessage();
 }

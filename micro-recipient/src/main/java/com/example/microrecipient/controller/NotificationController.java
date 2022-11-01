@@ -17,4 +17,9 @@ public class NotificationController {
   public List<String> getAndDeleteAllMessages() {
     return notificationService.getAndDeleteAllMessages();
   }
+
+  @GetMapping("/single-message")
+  public String getAndDeleteSingleMessage() {
+    return notificationService.getAndDeleteSingleMessage();
+  }
 }

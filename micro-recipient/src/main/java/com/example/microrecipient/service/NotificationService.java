@@ -19,8 +19,8 @@ public class NotificationService {
 
   public List<String> getAndDeleteAllMessages() {
     var messages = notificationRepository.findAll().stream()
-        .map(Notification::getMessage)
-        .collect(toList());
+      .map(Notification::getMessage)
+      .collect(toList());
 
     log.info("Received {} message(s) from the DB.", messages.size());
 
@@ -29,4 +29,21 @@ public class NotificationService {
 
     return messages;
   }
+
+  public String getAndDeleteSingleMessage() {
+    var notificationOptional = notificationRepository.getMinId()
+      .flatMap(notificationRepository::findById);
+
+    var messageOptional = notificationOptional.map(Notification::getMessage);
+
+    notificationOptional.ifPresent(this::logAndDelete);
+
+    return messageOptional.orElse(null);
+  }
+
+  private void logAndDelete(Notification notification) {
+    log.info("Deleting message '{}' from H2.", notification.getMessage());
+    notificationRepository.delete(notification);
+  }
+
 }
