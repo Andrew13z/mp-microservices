@@ -29,3 +29,16 @@ data:
               - 'micro-recipient-service:8081'
               - 'micro-collector-service:8082'
               - 'micro-visualizer-service:8083'
+      - job_name: 'kubernetes-service-endpoints'
+        metrics_path: /actuator/prometheus
+        kubernetes_sd_configs:
+        - role: endpoints
+        relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: kubernetes_namespace
+        - source_labels: [__meta_kubernetes_service_name]
+          action: replace
+          target_label: kubernetes_name
